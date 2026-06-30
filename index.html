@@ -88,6 +88,17 @@
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
+        .sortable-header {
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.2s;
+        }
+        .sortable-header:hover {
+            background-color: rgba(0,0,0,0.05);
+        }
+        .dark .sortable-header:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
     </style>
 </head>
 <body class="text-slate-800 antialiased">
@@ -230,12 +241,17 @@
                             <button onclick="filterTable('debt')" id="btnFilterDebt" class="filter-btn px-4 py-2 rounded-lg text-base font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/30">باقي مالي</button>
                         </div>
                         <div class="flex flex-wrap items-center gap-2">
-                            <button onclick="openColumnSettings()" class="bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 font-bold px-4 py-2 rounded-lg text-base flex items-center gap-1"><i class="fa-solid fa-gear"></i></button>
-                            <button onclick="exportExcel()" class="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border font-bold px-4 py-2 rounded-lg text-base flex items-center gap-1"><i class="fa-regular fa-file-excel"></i> إكسل</button>
-                            <button onclick="triggerCleanPrint()" class="bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300 border font-bold px-4 py-2 rounded-lg text-base flex items-center gap-1"><i class="fa-solid fa-file-pdf"></i> PDF</button>
-                            <button onclick="exportJSON()" class="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 border font-bold px-4 py-2 rounded-lg text-base flex items-center gap-1"><i class="fa-solid fa-download"></i> JSON</button>
-                            <label id="importJSONLabel" class="bg-fuchsia-50 dark:bg-fuchsia-900/30 text-fuchsia-700 dark:text-fuchsia-300 border font-bold px-4 py-2 rounded-lg text-base flex items-center gap-1 cursor-pointer"><i class="fa-solid fa-upload"></i> استيراد<input type="file" id="importJSONFile" accept=".json" class="hidden" onchange="importJSON(event)"></label>
-                            <button onclick="importOdooSalesOrders()" class="bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white font-bold px-4 py-2 rounded-lg text-base flex items-center gap-2 shadow-lg"><i class="fa-solid fa-file-import"></i> Odoo</button>
+                            <button onclick="sortByColumn('date')" class="bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 font-bold px-3 py-2 rounded-lg text-sm flex items-center gap-1" title="ترتيب بالتاريخ"><i class="fa-solid fa-calendar"></i> تاريخ</button>
+                            <button onclick="sortByColumn('total')" class="bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 font-bold px-3 py-2 rounded-lg text-sm flex items-center gap-1" title="ترتيب بالإجمالي"><i class="fa-solid fa-money-bill"></i> مبلغ</button>
+                            <button onclick="sortByColumn('remaining')" class="bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 font-bold px-3 py-2 rounded-lg text-sm flex items-center gap-1" title="ترتيب بالمتبقي"><i class="fa-solid fa-coins"></i> متبقي</button>
+                            <button onclick="sortByColumn('days')" class="bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 font-bold px-3 py-2 rounded-lg text-sm flex items-center gap-1" title="ترتيب بالأيام"><i class="fa-solid fa-clock"></i> أيام</button>
+                            <div class="w-px h-8 bg-slate-300 dark:bg-slate-600"></div>
+                            <button onclick="openColumnSettings()" class="bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 font-bold px-3 py-2 rounded-lg text-sm flex items-center gap-1"><i class="fa-solid fa-gear"></i></button>
+                            <button onclick="exportExcel()" class="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border font-bold px-3 py-2 rounded-lg text-sm flex items-center gap-1"><i class="fa-regular fa-file-excel"></i> إكسل</button>
+                            <button onclick="triggerCleanPrint()" class="bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300 border font-bold px-3 py-2 rounded-lg text-sm flex items-center gap-1"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+                            <button onclick="exportJSON()" class="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 border font-bold px-3 py-2 rounded-lg text-sm flex items-center gap-1"><i class="fa-solid fa-download"></i> JSON</button>
+                            <label id="importJSONLabel" class="bg-fuchsia-50 dark:bg-fuchsia-900/30 text-fuchsia-700 dark:text-fuchsia-300 border font-bold px-3 py-2 rounded-lg text-sm flex items-center gap-1 cursor-pointer"><i class="fa-solid fa-upload"></i> استيراد<input type="file" id="importJSONFile" accept=".json" class="hidden" onchange="importJSON(event)"></label>
+                            <button onclick="importOdooSalesOrders()" class="bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white font-bold px-3 py-2 rounded-lg text-sm flex items-center gap-2 shadow-lg"><i class="fa-solid fa-cloud-arrow-down"></i> Odoo</button>
                         </div>
                     </div>
                     <div class="relative mb-5 no-print">
@@ -370,6 +386,8 @@
         let currentFilter = 'all';
         let currentTab = 'main';
         let currentPage = 1;
+        let currentSortColumn = 'createdAt';
+        let currentSortDirection = 'desc';
         let unsubscribeListener = null;
         const pageSize = 30;
 
@@ -405,7 +423,7 @@
                     total: Number(order.total) || 0, paid: Number(order.paid) || 0, remaining: Number(order.remaining) || 0
                 };
                 await db.collection("orders").doc(order.id).set(cleanData, { merge: true });
-                console.log("✅ تم حفظ التغييرات بنجاح:", order.id);
+                console.log("✅ تم حفظ التغييرات:", order.id);
             } catch (e) { 
                 console.error("❌ فشل حفظ التغييرات:", e);
                 showToast('تعذر حفظ التغييرات: ' + (e.message || 'خطأ غير معروف'), 'error');
@@ -423,7 +441,8 @@
                 const newOrders = [];
                 snapshot.forEach((doc) => { newOrders.push({ id: doc.id, ...doc.data() }); });
                 orders = newOrders;
-                renderTable();
+                loadSortPreference();
+                sortAndRender();
             }, (error) => { console.error("❌ خطأ في جلب البيانات:", error); showToast('تعذر الاتصال بقاعدة البيانات', 'error'); });
         }
 
@@ -532,7 +551,7 @@
             currentBranch = b;
             localStorage.setItem('noor_current_branch', currentBranch);
             document.getElementById('currentBranchName').innerText = currentBranch === 'all' ? 'كل الفروع' : currentBranch;
-            currentPage = 1; renderTable();
+            currentPage = 1; sortAndRender();
             if (currentTab === 'reports') renderAllReports();
         }
 
@@ -695,7 +714,7 @@
             } 
         });
 
-                    // ========== استيراد ملف Odoo Sales Orders ==========
+        // ========== استيراد ملف Odoo Sales Orders ==========
         async function importOdooSalesOrders() {
             if (!currentUser || (currentUser.role !== 'super_admin' && currentUser.role !== 'branch_admin')) {
                 showToast('❌ غير مصرح لك بالاستيراد', 'error');
@@ -721,7 +740,6 @@
                         const odooOrders = XLSX.utils.sheet_to_json(firstSheet);
                         
                         console.log('📁 تم قراءة الملف:', odooOrders.length, 'طلب من Odoo');
-                        console.log('📋 مثال أول طلب:', odooOrders[0]);
                         
                         let imported = 0;
                         let skipped = 0;
@@ -736,7 +754,6 @@
                         
                         for (const odooOrder of odooOrders) {
                             try {
-                                // استخراج البيانات بالأسماء الصحيحة من الملف
                                 const orderRef = String(odooOrder['Order Reference'] || '').trim();
                                 const orderDate = odooOrder['Order Date'] || '';
                                 const customer = String(odooOrder['Customer'] || 'بدون اسم').trim();
@@ -748,14 +765,11 @@
                                 const deliveryStatus = String(odooOrder['Delivery Status'] || '').trim();
                                 const invoiceStatus = String(odooOrder['Invoice Status'] || '').trim();
                                 
-                                // تنسيق التاريخ
                                 let formattedDate = formatExcelDate(orderDate);
                                 
-                                // تحديد حالة التواجد والتسليم من Delivery Status
                                 let status = 'في المكتب';
                                 let delivery = 'لم يتم';
                                 
-                                // لو Delivery Status موجود نستخدمه
                                 if (deliveryStatus) {
                                     const delLower = deliveryStatus.toLowerCase();
                                     if (delLower.includes('تم') || delLower.includes('done') || delLower.includes('delivered')) {
@@ -763,25 +777,17 @@
                                         delivery = 'تم التسليم';
                                     } else if (delLower.includes('جاهز') || delLower.includes('ready')) {
                                         status = 'بالمحل';
-                                        delivery = 'لم يتم';
-                                    } else if (delLower.includes('شحن') || delLower.includes('shipping')) {
-                                        status = 'في المكتب';
-                                        delivery = 'لم يتم';
                                     }
-                                } 
-                                // لو مفيش Delivery Status نستخدم Payment Status
-                                else if (paymentStatus) {
+                                } else if (paymentStatus) {
                                     const payLower = paymentStatus.toLowerCase();
                                     if (payLower.includes('مدفوع') || payLower.includes('paid') || payLower === 'كامل') {
                                         status = 'بالمحل';
                                         delivery = 'تم التسليم';
                                     } else if (payLower.includes('جزئي') || payLower.includes('partial')) {
                                         status = 'بالمحل';
-                                        delivery = 'لم يتم';
                                     }
                                 }
                                 
-                                // بناء الملاحظات
                                 let notesParts = [];
                                 if (salesPerson) notesParts.push(`مندوب: ${salesPerson}`);
                                 if (paymentStatus) notesParts.push(`حالة الدفع: ${paymentStatus}`);
@@ -820,7 +826,6 @@
                         
                         hideLoading();
                         
-                        // عرض نتيجة الاستيراد
                         if (imported > 0 && skipped === 0) {
                             showToast(`✅ تم استيراد ${imported} طلب بنجاح`, 'success');
                         } else if (imported > 0 && skipped > 0) {
@@ -845,6 +850,7 @@
             
             input.click();
         }
+
         function formatExcelDate(dateValue) {
             if (!dateValue) {
                 const now = new Date();
@@ -925,6 +931,132 @@
                 loader.style.opacity = '0';
                 loader.style.transition = 'opacity 0.3s';
                 setTimeout(() => loader.remove(), 300);
+            }
+        }
+
+        // ========== نظام الترتيب المتعدد ==========
+        function sortByColumn(columnId) {
+            if (currentSortColumn === columnId) {
+                currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSortColumn = columnId;
+                currentSortDirection = 'asc';
+            }
+            saveSortPreference();
+            sortAndRender();
+        }
+
+        function sortAndRender() {
+            orders.sort((a, b) => {
+                let valA, valB;
+                
+                switch(currentSortColumn) {
+                    case 'date':
+                        valA = parseDate(a.date);
+                        valB = parseDate(b.date);
+                        break;
+                    case 'soNumber':
+                        valA = (a.soNumber || '').toString().toLowerCase();
+                        valB = (b.soNumber || '').toString().toLowerCase();
+                        return currentSortDirection === 'asc' ? naturalCompare(valA, valB) : naturalCompare(valB, valA);
+                    case 'name':
+                        valA = (a.name || '').toString().toLowerCase();
+                        valB = (b.name || '').toString().toLowerCase();
+                        break;
+                    case 'phone':
+                        valA = (a.phone || '').toString().toLowerCase();
+                        valB = (b.phone || '').toString().toLowerCase();
+                        break;
+                    case 'type':
+                        valA = (a.type || '').toString().toLowerCase();
+                        valB = (b.type || '').toString().toLowerCase();
+                        break;
+                    case 'total':
+                        valA = Number(a.total) || 0;
+                        valB = Number(b.total) || 0;
+                        break;
+                    case 'paid':
+                        valA = Number(a.paid) || 0;
+                        valB = Number(b.paid) || 0;
+                        break;
+                    case 'remaining':
+                        valA = Number(a.remaining) || 0;
+                        valB = Number(b.remaining) || 0;
+                        break;
+                    case 'status':
+                        valA = (a.status || '').toString().toLowerCase();
+                        valB = (b.status || '').toString().toLowerCase();
+                        break;
+                    case 'delivery':
+                        valA = (a.delivery || '').toString().toLowerCase();
+                        valB = (b.delivery || '').toString().toLowerCase();
+                        break;
+                    case 'notes':
+                        valA = (a.notes || '').toString().toLowerCase();
+                        valB = (b.notes || '').toString().toLowerCase();
+                        break;
+                    case 'days':
+                        valA = getDaysSince(a.date);
+                        valB = getDaysSince(b.date);
+                        break;
+                    case 'createdAt':
+                        valA = a.createdAt ? (a.createdAt.seconds || 0) : 0;
+                        valB = b.createdAt ? (b.createdAt.seconds || 0) : 0;
+                        break;
+                    default:
+                        return 0;
+                }
+                
+                let comparison = 0;
+                if (valA < valB) comparison = -1;
+                else if (valA > valB) comparison = 1;
+                
+                return currentSortDirection === 'asc' ? comparison : -comparison;
+            });
+            
+            currentPage = 1;
+            renderTable();
+        }
+
+        function parseDate(dateStr) {
+            if (!dateStr) return new Date(0);
+            const parts = dateStr.split('/');
+            if (parts.length === 3) {
+                return new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+            }
+            return new Date(0);
+        }
+
+        function naturalCompare(a, b) {
+            const ax = [], bx = [];
+            a.replace(/(\d+)|(\D+)/g, function(_, $1, $2) { ax.push([$1 || Infinity, $2 || '']); });
+            b.replace(/(\d+)|(\D+)/g, function(_, $1, $2) { bx.push([$1 || Infinity, $2 || '']); });
+            
+            while (ax.length && bx.length) {
+                const an = ax.shift();
+                const bn = bx.shift();
+                const nn = (an[0] - bn[0]) || an[1].localeCompare(bn[1]);
+                if (nn) return nn;
+            }
+            return ax.length - bx.length;
+        }
+
+        function saveSortPreference() {
+            if (currentUser) {
+                localStorage.setItem('noor_sort_column', currentSortColumn);
+                localStorage.setItem('noor_sort_direction', currentSortDirection);
+            }
+        }
+
+        function loadSortPreference() {
+            const savedColumn = localStorage.getItem('noor_sort_column');
+            const savedDirection = localStorage.getItem('noor_sort_direction');
+            
+            if (savedColumn && allColumns.some(c => c.id === savedColumn || savedColumn === 'createdAt')) {
+                currentSortColumn = savedColumn;
+            }
+            if (savedDirection === 'asc' || savedDirection === 'desc') {
+                currentSortDirection = savedDirection;
             }
         }
 
@@ -1150,9 +1282,21 @@
                 type:'النوع', total:'الإجمالي', paid:'المدفوع', remaining:'المتبقي', 
                 status:'التواجد', delivery:'التسليم', notes:'ملاحظات', days:'الأيام' 
             };
+            
             visibleCols.forEach(col => { 
-                headerHtml += `<th class="p-4 border-b border-slate-200 dark:border-slate-600${['total','paid','remaining','status','delivery','days'].includes(col.id)?' text-center':''}">${names[col.id]}</th>`; 
+                const isActive = currentSortColumn === col.id;
+                const sortIcon = isActive ? (currentSortDirection === 'asc' ? ' ▲' : ' ▼') : ' ⇅';
+                const isSortable = true;
+                
+                headerHtml += `<th class="p-4 border-b border-slate-200 dark:border-slate-600${['total','paid','remaining','status','delivery','days'].includes(col.id)?' text-center':''} 
+                    ${isSortable ? 'sortable-header' : ''}"
+                    ${isSortable ? `onclick="sortByColumn('${col.id}')" title="اضغط للترتيب"` : ''}>
+                    ${isActive ? `<span class="text-odoo-500 font-bold text-xs">${currentSortDirection === 'asc' ? '▲' : '▼'}</span> ` : ''}
+                    ${names[col.id]}
+                    ${!isActive ? '<span class="text-slate-300 text-xs mr-1">⇅</span>' : ''}
+                </th>`; 
             });
+            
             headerHtml += '<th class="p-4 border-b border-slate-200 dark:border-slate-600 text-center no-print">واتساب</th>';
             if (isAdmin) headerHtml += '<th class="p-4 border-b border-slate-200 dark:border-slate-600 text-center no-print">إجراءات</th>';
             theadRow.innerHTML = headerHtml;
