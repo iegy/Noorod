@@ -186,6 +186,7 @@
                 <div class="max-w-7xl mx-auto px-6 flex gap-1">
                     <button onclick="switchTab('main')" id="tabMain" class="px-5 py-3 text-base font-bold text-white border-b-2 border-white transition-colors"><i class="fa-solid fa-table-list ml-2"></i> الرئيسية</button>
                     <button onclick="switchTab('reports')" id="tabReports" class="px-5 py-3 text-base font-medium text-white/70 hover:text-white transition-colors"><i class="fa-solid fa-chart-simple ml-2"></i> التقارير</button>
+                    <button onclick="switchTab('tips')" id="tabTips" class="px-5 py-3 text-base font-medium text-white/70 hover:text-white transition-colors whitespace-nowrap"><i class="fa-solid fa-lightbulb ml-2"></i> نصائح البيع</button>
                 </div>
             </div>
         </header>
@@ -305,7 +306,31 @@
                     <div class="odoo-card p-6 rounded-xl"><div class="flex justify-between items-start mb-4"><h3 class="font-bold text-slate-700 dark:text-slate-200 text-lg"><i class="fa-solid fa-money-bill-wave text-green-500 ml-2"></i> تقرير مالي</h3><button onclick="printReport('financial')" class="text-sm bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 px-3 py-1.5 rounded-lg font-bold"><i class="fa-solid fa-print ml-1"></i> طباعة</button></div><div id="reportFinancial" class="max-h-52 overflow-y-auto text-base space-y-2"></div></div>
                 </div>
             </div>
+                   <!-- ==================== تبويب نصائح البيع ==================== -->
+            <div id="tipsTabContent" class="hidden">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-extrabold text-slate-800 dark:text-white mb-2">
+                        <i class="fa-solid fa-lightbulb text-yellow-500 ml-2"></i> نصائح احترافية في بيع النظارات الطبية
+                    </h2>
+                    <p class="text-slate-500 dark:text-slate-400">مجموعة من أفضل النصائح لزيادة المبيعات وبناء علاقات قوية مع العملاء</p>
+                </div>
+
+                <!-- فلاتر النصائح -->
+                <div class="flex flex-wrap gap-2 mb-6 no-print">
+                    <button onclick="filterTips('all')" id="btnTipAll" class="px-4 py-2 rounded-lg text-sm font-bold bg-odoo-500 text-white">الكل</button>
+                    <button onclick="filterTips('sales')" id="btnTipSales" class="px-4 py-2 rounded-lg text-sm font-medium bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-odoo-50">💰 مهارات البيع</button>
+                    <button onclick="filterTips('product')" id="btnTipProduct" class="px-4 py-2 rounded-lg text-sm font-medium bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-odoo-50">🔍 معرفة المنتج</button>
+                    <button onclick="filterTips('customer')" id="btnTipCustomer" class="px-4 py-2 rounded-lg text-sm font-medium bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-odoo-50">❤️ خدمة العملاء</button>
+                    <button onclick="filterTips('upsell')" id="btnTipUpsell" class="px-4 py-2 rounded-lg text-sm font-medium bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-odoo-50">📈 زيادة المبيعات</button>
+                    <button onclick="filterTips('communication')" id="btnTipComm" class="px-4 py-2 rounded-lg text-sm font-medium bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-odoo-50">🗣️ التواصل</button>
+                </div>
+
+                <!-- بطاقات النصائح -->
+                <div id="tipsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            </div>
+
         </main>
+
 
         <!-- المودالات -->
         <div id="passwordModal" class="modal-overlay" onclick="if(event.target === this) closePasswordModal()">
@@ -414,7 +439,105 @@
             { id: 'status', name: 'الحالة', visible: true }, { id: 'delivery', name: 'التسليم', visible: true },
             { id: 'notes', name: 'ملاحظات', visible: true }, { id: 'days', name: 'الأيام', visible: true }
         ];
+ // ==================== 40 نصيحة بيع احترافية ====================
+        const salesTips = [
+            { id: 1, category: 'sales', title: 'اسأل قبل ما تعرض', content: 'اسأل العميل عن طبيعة عمله وهواياته واحتياجاته اليومية قبل ما تعرض عليه أي نظارة. العميل اللي بيشتغل قدام شاشة طول اليوم محتاج عدسات Blue Cut، واللي بيسوق كتير محتاج عدسات Polarized.', icon: '❓' },
+            { id: 2, category: 'sales', title: 'قاعدة الـ 3 خيارات', content: 'متخليش العميل يحتار! اعرض عليه 3 اختيارات فقط: خيار اقتصادي، وخيار متوسط، وخيار ممتاز. ده بيساعده ياخد قرار أسرع ويركز في المقارنة.', icon: '🎯' },
+            { id: 3, category: 'sales', title: 'بيع القيمة مش السعر', content: 'متقولش "النظارة دي بـ 2000 جنيه"، قول "النظارة دي هتحمي عينك لمدة سنتين وعدساتها ألماني بتقليل 99% من الإجهاد". ركز على الفايدة اللي هتعود على العميل.', icon: '💎' },
+            { id: 4, category: 'sales', title: 'أسلوب المرآة', content: 'لاحظ لغة جسد العميل واعكسها بطريقة طبيعية. لو العميل بيتكلم بهدوء، اتكلم بهدوء. لو متحمس، شاركه الحماس. ده بيخلق ألفة وثقة بسرعة.', icon: '🪞' },
+            { id: 5, category: 'sales', title: 'إغلاق البيع بذكاء', content: 'بدل ما تسأل "هتاخد النظارة؟"، اسأل "تحب تدفع كاش ولا ڤيزا؟" أو "تحب نبدأ القياس النهاردة ولا بكرة؟". افترض إن البيع تم وانتقل للخطوة اللي بعدها.', icon: '🔐' },
+            { id: 6, category: 'product', title: 'اعرف منتجك كويس', content: 'ذاكر مواصفات كل نوع عدسات: الفرق بين البولي كربونات والـ CR-39، معامل الانكسار، أنواع الطلاءات (Anti-Reflective, Anti-Scratch, UV Protection). العميل بيحس بثقة البايع اللي فاهم.', icon: '📚' },
+            { id: 7, category: 'product', title: 'العدسات الفوتوكرومية', content: 'فوتوكروميك (Transition) مش مجرد رفاهية! اشرح للعميل إنها بتريح العين في كل الإضاءات وبتغنيه عن شراء نظارتين (شمسية وطبية). وفر فلوسه على المدى الطويل.', icon: '☀️' },
+            { id: 8, category: 'product', title: 'العدسات التقدمية', content: 'لما تبيع Progressive، اشرح للعميل إنها هتخليه يشوف كل المسافات بنظارة واحدة بدون خطوط. وخده في جولة سريعة يقرأ حاجة قريبة ويبعد يشوف بعيد عشان يحس بالفرق بنفسه.', icon: '🔍' },
+            { id: 9, category: 'product', title: 'إطارات التيتانيوم', content: 'التيتانيوم خفيف جداً ومضاد للحساسية وقوي. مثالي للعملاء اللي بيلبسوا النظارة طول اليوم أو عندهم حساسية من المعادن. سعره أعلى لكن يستحق كل جنيه.', icon: '🪶' },
+            { id: 10, category: 'customer', title: 'اتصل بالعميل بعد البيع', content: 'كلم العميل بعد أسبوع من استلام النظارة واسأله عن رأيه. المكالمة البسيطة دي بتخلي 80% من العملاء يرجعوا لك تاني ويشتروا منك.', icon: '📞' },
+            { id: 11, category: 'customer', title: 'نظام المتابعة', content: 'سجل بيانات كل عميل (النوع اللي بيحبه، مقاس النظارة، نوع العدسات). لما تنزل تشكيلة جديدة، اتصل بالعملاء اللي بيناسبهم النوع الجديد. هتحسسهم إنك فاكرهم ومهتم بيهم.', icon: '📋' },
+            { id: 12, category: 'customer', title: 'اسمع أكتر مما تتكلم', content: 'خلي العميل يحكي عن مشاكله مع النظارة الحالية أو اللي جربها قبل كده. كل ما سمعت أكثر، كل ما قدرت تقدمله الحل المناسب. العميل بيحب البايع اللي بيسمعه.', icon: '👂' },
+            { id: 13, category: 'customer', title: 'التعامل مع الشكاوى', content: 'لما عميل يشتكي، اشكره على إنه نبهك للمشكلة. قوله "أنا متأسف جداً، وهنحل الموضوع فوراً". متدافعش أو تبرر، ركز على الحل. العميل الغضبان اللي اتحلت مشكلته بيبقى عميل مخلص للأبد.', icon: '🤝' },
+            { id: 14, category: 'customer', title: 'برنامج الإحالات', content: 'قدم خصم 10% للعميل اللي يجيبلك زبون جديد. أو اعمله صيانة مجانية لنظارته. الكلام بين الناس هو أقوى دعاية لمحل نظارات.', icon: '🔗' },
+            { id: 15, category: 'upsell', title: 'البيع الإضافي الذكي', content: 'لما العميل يشتري نظارة، اعرض عليه: "معاك محلول تنظيف احترافي؟"، "جربت مناديل التنظيف المضادة للبكتيريا؟"، "تحب تضيف حافظة نظارة مغناطيسية؟". إضافات بسيطة بتزود الفاتورة 20-30%.', icon: '🛒' },
+            { id: 16, category: 'upsell', title: 'الباقة الشاملة', content: 'اعمل باقات: "النظارة + المحلول + الحافظة + التأمين ضد الكسر". سعر الباقة أقل من مجموعهم لو اتباعوا منفصلين. العميل بيحس إنه كسب صفقة وهتزود مبيعاتك.', icon: '📦' },
+            { id: 17, category: 'upsell', title: 'العدسة التانية بنص السعر', content: 'اعرض على العميل يعمل نظارة احتياطية بنفس المقاس بعدسة تانية بنص السعر. كتير من العملاء بيوافقوا خصوصاً لو النظارة الأساسية غالية. أنت كسبت بيع تاني وهو ضمن إنه مش هيتعطل.', icon: '🎪' },
+            { id: 18, category: 'upsell', title: 'قسط مريح', content: 'اعرض تقسيط على 3 شهور بدون فوائد للمبالغ الكبيرة. "النظارة دي بـ 3000 جنيه، تقدر تدفع 1000 دلوقتي و1000 كل شهر". هتزود مبيعاتك بنسبة 40% على الأقل.', icon: '💳' },
+            { id: 19, category: 'communication', title: 'لغة الجسد الإيجابية', content: 'ابتسم دايماً، حافظ على تواصل بصري، متقفش ودراعك متقاطع (ده بيوحي إنك متحفظ). قف بشكل مفتوح ومرحب. 55% من التواصل بيكون بلغة الجسد.', icon: '😊' },
+            { id: 20, category: 'communication', title: 'استخدم اسم العميل', content: 'لما تعرف اسم العميل، استخدمه في الحوار بشكل طبيعي. "يا أستاذ محمد، البولارايزد هتفرق معاك كتير في القيادة". استخدام الاسم بيخلي التواصل شخصي وأقوى.', icon: '🏷️' },
+            { id: 21, category: 'communication', title: 'القصص أقوى من الأرقام', content: 'بدل ما تقول "العدسة دي بتقلل الإجهاد بنسبة 70%"، قول "عندي عميل كان بيشتكي من صداع يومي، ومن ما جرب العدسة دي مبقالوش أي صداع". القصص بتعلق في الذاكرة.', icon: '📖' },
+            { id: 22, category: 'communication', title: 'متنتقدش نظارة العميل الحالية', content: 'حتى لو النظارة مش مناسبة، متقولش "دي مش حلوة" أو "دي قديمة". قول "النظارة دي كانت اختيار ممتاز في وقتها، بس حالياً في تكنولوجيا أحدث هتريحك أكتر".', icon: '🗣️' },
+            { id: 23, category: 'product', title: 'العدسات المضادة للضوء الأزرق', content: '90% من العملاء اللي بيشتكوا من إرهاق العين محتاجين Blue Cut. اسأل العميل: "بتقضي كام ساعة قدام الموبايل والكمبيوتر؟" وبناءً على إجابته قدمله الحل.', icon: '📱' },
+            { id: 24, category: 'sales', title: 'سيكولوجية السعر', content: 'لما تعرض سعر، ابدأ بالغالي وبعدين المتوسط وبعدين الاقتصادي. "عندنا الإطار ده بـ 3000، وده بـ 2000، وده بـ 1200". العميل هيقارن والـ 2000 هتبقى معقولة بالنسبة له.', icon: '🧠' },
+            { id: 25, category: 'customer', title: 'ذكرة العميل بمواعيده', content: 'اعمل نظام يذكر العميل بموعد فحص النظر الدوري كل 6 شهور أو سنة. رسالة واتساب بسيطة: "أستاذ محمد، فحص نظرك السنوي مستنيك، تعال في أي وقت يناسبك".', icon: '⏰' },
+            { id: 26, category: 'product', title: 'العدسات المستقطبة (Polarized)', content: 'لعملاء القيادة والصيد والرحلات، البولارايزد مش رفاهية. اشرحله إزاي بتشيل الانعكاسات من الميه والطرق. خليه يبص من ورا العدسة على طريق أو مصدر ضوء عشان يشوف الفرق.', icon: '🕶️' },
+            { id: 27, category: 'upsell', title: 'تأمين النظارة', content: 'اعرض تأمين سنوي على النظارة ضد الكسر أو الخدش بمبلغ بسيط. كتير من الآباء والأمهات بيشتروا التأمين لنظارات أولادهم. دخل إضافي مضمون.', icon: '🛡️' },
+            { id: 28, category: 'sales', title: 'البيع بالمقارنة البصرية', content: 'استخدم عدسة تجريبية أو جهاز محاكاة يوري العميل الفرق بين أنواع العدسات. "شوف الفرق بنفسك". لما العميل يشوف الفرق بعينه، مش هيحتاج يقنعه حد.', icon: '👁️' },
+            { id: 29, category: 'communication', title: 'كلمات سحرية في البيع', content: 'استخدم كلمات: "تخيل"، "لاحظ الفرق"، "جرب بنفسك"، "عملائنا بيحبوا"، "دي الأكثر مبيعاً"، "لفترة محدودة". الكلمات دي بتخاطب العقل الباطن وتشجع على الشراء.', icon: '✨' },
+            { id: 30, category: 'customer', title: 'هدية بسيطة بفرق كبير', content: 'قدم منديل تنظيف أو حافظة نظارة كهدية مع كل عملية شراء. الهدية الصغيرة دي بتخلي العميل يحس بالتقدير وبيحكي عنها لأصحابه. استثمار صغير بعائد كبير.', icon: '🎁' },
+            { id: 31, category: 'product', title: 'النظارات الرياضية', content: 'اللي بيلعبوا رياضة محتاجين نظارات خاصة: إطارات مرنة، عدسات مقاومة للصدمات، سيليكون على الأنف. اسأل العميل عن رياضته وقدمله الحل المتخصص.', icon: '🏃' },
+            { id: 32, category: 'sales', title: 'أول انطباع يدوم', content: 'أول 7 ثواني من دخول العميل المحل بتحدد 70% من قرار الشراء. استقبله بابتسامة، قدمله مشروب، خليه يحس بالترحيب قبل أي حاجة.', icon: '🚪' },
+            { id: 33, category: 'upsell', title: 'النظارة الشمسية الطبية', content: 'لما العميل يشتري نظارة طبية، اعرض عليه يعمل نظارة شمسية بنفس المقاس بخصم. معظم العملاء بيوافقوا خصوصاً في فصل الصيف.', icon: '☀️' },
+            { id: 34, category: 'communication', title: 'متقولش "لأ" للعميل', content: 'بدل ما تقول "للأسف مش عندنا"، قول "مش متوفرة حالياً لكن أقدر أجبهالك في 48 ساعة" أو "عندي حاجة شبهها وهتعجبك أكتر". خليك دايماً عندك بديل.', icon: '🔄' },
+            { id: 35, category: 'customer', title: 'اسأل عن العائلة', content: 'لما عميل يجي ومعه ابنه أو بنته، اسأل عنهم وقدملهم نصيحة. "نظارة ابنك محتاجة تكون خفيفة عشان وزنها على الوش". الاهتمام بالعيلة بيخلي العميل يثق فيك ثقة عمياء.', icon: '👨‍👩‍👧‍👦' },
+            { id: 36, category: 'product', title: 'النظارة المناسبة لشكل الوجه', content: 'اعرف أشكال الوجوه والإطارات المناسبة لكل شكل. وش دائري يحتاج إطار مربع، وش مربع يحتاج إطار دائري. العميل هيثق في رأيك وهيعتبرها استشارة مش مجرد بيع.', icon: '🔲' },
+            { id: 37, category: 'sales', title: 'وقت العميل من دهب', content: 'لو العميل مستعجل، قدمله الخدمة السريعة. "هختارلك أفضل 3 إطارات تناسبك في دقيقتين". لما تحترم وقته، هيحترمك وهيرجعلك.', icon: '⚡' },
+            { id: 38, category: 'upsell', title: 'عروض المواسم', content: 'في الأعياد والمناسبات، قدم عروض: "اشتري نظارتين والتالتة مجاناً" أو "خصم 25% على العدسات الفوتوكرومية". العروض الموسمية بتجذب عملاء جدد وبتزود المبيعات.', icon: '🎉' },
+            { id: 39, category: 'communication', title: 'العميل المحتار', content: 'لما العميل يحتار بين اختيارين، ساعده: "الاتنين شيك جدا، بس الإطار ده هيبرز ملامح وشك أكتر". العميل محتاجك تاخدله القرار.', icon: '🤔' },
+            { id: 40, category: 'customer', title: 'بطاقة الولاء', content: 'اعمل نظام نقاط: كل 1000 جنيه = نقطة، وكل 10 نقاط = خصم 500 جنيه على الشراء الجاي. نظام بسيط بيخلي العميل يرجعلك تاني وتاني.', icon: '💳' },
+        ];
 
+        // ==================== دوال عرض النصائح ====================
+        function renderTips(filter = 'all') {
+            currentTipFilter = filter;
+            const container = document.getElementById('tipsContainer');
+            const filtered = filter === 'all' ? salesTips : salesTips.filter(t => t.category === filter);
+            
+            container.innerHTML = filtered.map(tip => `
+                <div class="odoo-card p-6 rounded-xl tip-card">
+                    <div class="flex items-start gap-4">
+                        <div class="text-4xl">${tip.icon}</div>
+                        <div class="flex-1">
+                            <span class="tip-category-badge ${getTipCategoryClass(tip.category)}">${getTipCategoryName(tip.category)}</span>
+                            <h3 class="text-lg font-bold text-slate-800 dark:text-white mt-2 mb-3">${tip.title}</h3>
+                            <p class="text-slate-600 dark:text-slate-300 text-base leading-relaxed">${tip.content}</p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            document.querySelectorAll('#tipsTabContent [id^="btnTip"]').forEach(b => {
+                b.classList.remove('bg-odoo-500', 'text-white');
+                b.classList.add('bg-slate-100', 'dark:bg-slate-700', 'text-slate-600', 'dark:text-slate-300');
+            });
+            const activeBtn = document.getElementById('btnTip' + filter.charAt(0).toUpperCase() + filter.slice(1));
+            if (activeBtn) { 
+                activeBtn.classList.add('bg-odoo-500', 'text-white'); 
+                activeBtn.classList.remove('bg-slate-100', 'dark:bg-slate-700', 'text-slate-600', 'dark:text-slate-300'); 
+            }
+        }
+
+        function filterTips(category) { 
+            renderTips(category); 
+        }
+
+        function getTipCategoryClass(category) {
+            const classes = {
+                'sales': 'bg-amber-100 text-amber-800',
+                'product': 'bg-blue-100 text-blue-800',
+                'customer': 'bg-green-100 text-green-800',
+                'upsell': 'bg-purple-100 text-purple-800',
+                'communication': 'bg-rose-100 text-rose-800'
+            };
+            return classes[category] || 'bg-slate-100 text-slate-800';
+        }
+
+        function getTipCategoryName(category) {
+            const names = {
+                'sales': '💰 مهارات البيع',
+                'product': '🔍 معرفة المنتج',
+                'customer': '❤️ خدمة العملاء',
+                'upsell': '📈 زيادة المبيعات',
+                'communication': '🗣️ التواصل'
+            };
+            return names[category] || category;
+        }
         // ========== الوضع الليلي ==========
         function applyDarkMode(isDark) { 
             if (isDark) { document.documentElement.classList.add('dark'); document.getElementById('darkModeIcon').className = 'fa-solid fa-sun'; } 
