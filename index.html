@@ -695,7 +695,7 @@
             } 
         });
 
-        // ========== استيراد ملف Odoo Sales Orders ==========
+              // ========== استيراد ملف Odoo Sales Orders (تشخيص) ==========
         async function importOdooSalesOrders() {
             if (!currentUser || (currentUser.role !== 'super_admin' && currentUser.role !== 'branch_admin')) {
                 showToast('❌ غير مصرح لك بالاستيراد', 'error');
@@ -720,83 +720,20 @@
                         const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
                         const odooOrders = XLSX.utils.sheet_to_json(firstSheet);
                         
-                        console.log('📁 تم قراءة الملف:', odooOrders.length, 'طلب من Odoo');
+                        // 👇 تشخيص - اعرض أسماء الأعمدة
+                        console.log('📋 أسماء الأعمدة في الملف:', Object.keys(odooOrders[0]));
+                        console.log('📋 أول صف كامل:', odooOrders[0]);
                         
-                        let imported = 0;
-                        let skipped = 0;
-                        
-                        let targetBranch = currentBranch;
-                        if (currentUser.role === 'super_admin' && currentBranch === 'all') {
-                            targetBranch = branches[0] || 'رشيد';
-                        } else if (currentUser.role === 'branch_admin') {
-                            targetBranch = currentUser.branch;
-                        }
-                        
-                        for (const odooOrder of odooOrders) {
-                            try {
-                                const orderRef = String(odooOrder['Order Reference'] || odooOrder['OrderReference'] || '').trim();
-                                const orderDate = odooOrder['Order Date'] || odooOrder['OrderDate'] || '';
-                                const customer = String(odooOrder['Customer'] || odooOrder['العميل'] || 'بدون اسم').trim();
-                                const phone = String(odooOrder['Phone'] || odooOrder['التليفون'] || odoOrder['Mobile'] || 'غير متوفر').trim();
-                                const salesPerson = String(odooOrder['SalesPerson'] || odooOrder['Sales Person'] || odoOrder['المندوب'] || '').trim();
-                                const total = parseFloat(odooOrder['Total'] || odooOrder['الإجمالي'] || 0) || 0;
-                                const amountPaid = parseFloat(odooOrder['Amount paid'] || odooOrder['AmountPaid'] || odoOrder['المدفوع'] || 0) || 0;
-                                const paymentStatus = String(odooOrder['Payment status'] || odooOrder['PaymentStatus'] || odoOrder['حالة الدفع'] || '').trim();
-                                
-                                let formattedDate = formatExcelDate(orderDate);
-                                
-                                let status = 'في المكتب';
-                                let delivery = 'لم يتم';
-                                
-                                if (paymentStatus.includes('مدفوع') || paymentStatus.includes('paid') || paymentStatus === 'مدفوع بالكامل') {
-                                    status = 'بالمحل';
-                                    delivery = 'تم التسليم';
-                                } else if (paymentStatus.includes('جزئي') || paymentStatus.includes('partial')) {
-                                    status = 'بالمحل';
-                                }
-                                
-                                const newOrder = {
-                                    date: formattedDate,
-                                    branch: targetBranch,
-                                    soNumber: orderRef,
-                                    name: customer,
-                                    phone: phone,
-                                    type: 'نظارة وعدسات جديدة',
-                                    status: status,
-                                    delivery: delivery,
-                                    notes: `مندوب: ${salesPerson} | حالة الدفع: ${paymentStatus} | مستورد من Odoo`,
-                                    total: total,
-                                    paid: amountPaid,
-                                    remaining: Math.max(0, total - amountPaid),
-                                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                                    odooRef: orderRef,
-                                    importedAt: new Date().toISOString(),
-                                    importedBy: currentUser.name
-                                };
-                                
-                                await db.collection("orders").add(newOrder);
-                                imported++;
-                                
-                            } catch (err) {
-                                console.error('❌ خطأ في إضافة الطلب:', odooOrder['Order Reference'], err);
-                                skipped++;
-                            }
-                        }
+                        // 👇 اعرض الأسماء في رسالة
+                        const columns = Object.keys(odooOrders[0]).join('\n');
+                        alert('الأعمدة الموجودة في الملف:\n\n' + columns + '\n\nشوف الـ Console كمان (F12)');
                         
                         hideLoading();
-                        
-                        if (skipped > 0) {
-                            showToast(`✅ تم استيراد ${imported} طلب بنجاح | ❌ فشل ${skipped} طلب`, 'warning');
-                        } else {
-                            showToast(`✅ تم استيراد ${imported} طلب بنجاح من Odoo`, 'success');
-                        }
-                        
-                        if (currentTab === 'reports') renderAllReports();
                         
                     } catch (err) {
                         hideLoading();
-                        console.error('❌ خطأ في قراءة الملف:', err);
-                        showToast('❌ الملف غير صالح. تأكد من تنسيق Excel الصحيح', 'error');
+                        console.error('❌ خطأ:', err);
+                        showToast('❌ خطأ في قراءة الملف', 'error');
                     }
                 };
                 
@@ -805,7 +742,6 @@
             
             input.click();
         }
-
         function formatExcelDate(dateValue) {
             if (!dateValue) {
                 const now = new Date();
